@@ -1,15 +1,7 @@
 const properties = require("./json/properties.json");
 const users = require("./json/users.json");
-const { Pool } = require('pg');
 
-const pool = new Pool({
-  user: 'labber',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
-
-/// Users
+const pool = require("./index");
 
 /**
  * Get a single user from the database given their email.
@@ -163,6 +155,8 @@ const getAllProperties = function (options, limit = 10) {
   ORDER BY cost_per_night
   LIMIT $${queryParams.length};
   `;
+
+  console.log(queryString);
 
   // 6
   return pool.query(queryString, queryParams).then((res) => res.rows);
