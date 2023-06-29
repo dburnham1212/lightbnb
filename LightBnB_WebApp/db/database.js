@@ -164,36 +164,41 @@ const getAllProperties = function (options, limit = 10) {
   LIMIT $${queryParams.length};
   `;
 
-  // 5
-  console.log(queryString, queryParams);
-
   // 6
   return pool.query(queryString, queryParams).then((res) => res.rows);
 };
 
-// const getAllProperties = (options, limit = 10) => {
-
-//   return pool
-//     .query(
-//       `SELECT * FROM properties LIMIT $1`,
-//       [limit])
-//     .then((result) => {
-//       return result.rows;
-//     })
-//     .catch((err) => {
-//       console.log(err.message);
-//     });
-// };
 /**
  * Add a property to the database
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function (property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
+  let queryParams = [];
+
+  
+  let insertIdString = ``;
+  let instertParamString = ``;
+  for(let i = 0; i < Object.keys(property).length; i++) {
+    insertIdString += `${Object.keys(property)[i]}`;
+    if(i !== Object.keys(property).length - 1){
+      insertIdString += `, `;
+    }
+    instertParamString += `$${i + 1}`;
+    if(i !== Object.keys(property).length - 1){
+      instertParamString += `, `;
+    }
+    queryParams.push(property[Object.keys(property)[i]]);
+  }
+  let queryString = `INSERT INTO properties (${insertIdString}) VALUES (${instertParamString}) RETURNING *`
+   return pool
+  .query(queryString, queryParams)
+  .then((result) => {
+    return result.rows;
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
 };
 
 module.exports = {
